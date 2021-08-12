@@ -35,7 +35,6 @@ SLEEP_INTERVAL_AFTER_RUN = 5
 try:
     from playsound import playsound as _playsound, PlaysoundException
 
-
     def playsound(*args):
         try:
             return _playsound(*args)
@@ -108,7 +107,7 @@ class CentersPage(HTMLPage):
             # JavaScript:
             # var t = (e = r()(e)).data("u")
             #     , n = atob(t.replace(/\s/g, '').split('').reverse().join(''));
-
+            
             import base64
             href = base64.urlsafe_b64decode(''.join(span.attrib['data-u'].split())[::-1]).decode()
             query = dict(parse.parse_qsl(parse.urlsplit(href).query))
@@ -122,9 +121,8 @@ class CentersPage(HTMLPage):
 
             if 'page' in query:
                 return int(query['page'])
-
+        
         return None
-
 
 class CenterResultPage(JsonPage):
     pass
@@ -164,8 +162,8 @@ class CenterBookingPage(JsonPage):
         agenda_ids = []
         for a in self.doc['data']['agendas']:
             if motive_id in a['visit_motive_ids'] and \
-                    not a['booking_disabled'] and \
-                    (not practice_id or a['practice_id'] == practice_id):
+               not a['booking_disabled'] and \
+               (not practice_id or a['practice_id'] == practice_id):
                 agenda_ids.append(str(a['id']))
 
         return agenda_ids
@@ -252,8 +250,7 @@ class Doctolib(LoginBrowser):
         self.session.headers['sec-fetch-dest'] = 'document'
         self.session.headers['sec-fetch-mode'] = 'navigate'
         self.session.headers['sec-fetch-site'] = 'same-origin'
-        self.session.headers[
-            'User-Agent'] = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'
+        self.session.headers['User-Agent'] = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'
 
         self.patient = None
 
@@ -262,9 +259,8 @@ class Doctolib(LoginBrowser):
             self.open(self.BASEURL + '/sessions/new')
         except ServerError as e:
             if e.response.status_code in [503] \
-                    and 'text/html' in e.response.headers['Content-Type'] \
-                    and (
-                    'cloudflare' in e.response.text or 'Checking your browser before accessing' in e.response.text):
+                and 'text/html' in e.response.headers['Content-Type'] \
+                    and ('cloudflare' in e.response.text or 'Checking your browser before accessing' in e .response.text):
                 log('Request blocked by CloudFlare', color='red')
             if e.response.status_code in [520]:
                 log('Cloudflare is unable to connect to Doctolib server. Please retry later.', color='red')
@@ -283,8 +279,7 @@ class Doctolib(LoginBrowser):
             print("Requesting 2fa code...")
             if not code:
                 if not sys.__stdin__.isatty():
-                    log("Auth Code input required, but no interactive terminal available. Please provide it via command line argument '--code'.",
-                        color='red')
+                    log("Auth Code input required, but no interactive terminal available. Please provide it via command line argument '--code'.", color='red')
                     return False
                 self.send_auth_code.go(
                     json={'two_factor_auth_method': 'email'}, method="POST")
@@ -304,12 +299,12 @@ class Doctolib(LoginBrowser):
         for city in where:
             try:
                 self.centers.go(where=city, params={
-                    'ref_visit_motive_ids[]': motives, 'page': page})
+                                'ref_visit_motive_ids[]': motives, 'page': page})
             except ServerError as e:
                 if e.response.status_code in [503]:
                     if 'text/html' in e.response.headers['Content-Type'] \
-                            and ('cloudflare' in e.response.text or
-                                 'Checking your browser before accessing' in e.response.text):
+                        and ('cloudflare' in e.response.text or
+                             'Checking your browser before accessing' in e .response.text):
                         log('Request blocked by CloudFlare', color='red')
                     return
                 if e.response.status_code in [520]:
@@ -364,8 +359,7 @@ class Doctolib(LoginBrowser):
         motives_id = dict()
         for vaccine in vaccine_list:
             motives_id[vaccine] = self.page.find_motive(
-                r'.*({})'.format(vaccine),
-                singleShot=(vaccine == self.vaccine_motives[self.KEY_JANSSEN] or only_second or only_third))
+                r'.*({})'.format(vaccine), singleShot=(vaccine == self.vaccine_motives[self.KEY_JANSSEN] or only_second or only_third))
 
         motives_id = dict((k, v)
                           for k, v in motives_id.items() if v is not None)
@@ -385,14 +379,12 @@ class Doctolib(LoginBrowser):
                     # do not filter to give a chance
                     agenda_ids = center_page.get_agenda_ids(motive_id)
 
-                if self.try_to_book_place(profile_id, motive_id, practice_id, agenda_ids, vac_name.lower(), start_date,
-                                          end_date, only_second, only_third, dry_run):
+                if self.try_to_book_place(profile_id, motive_id, practice_id, agenda_ids, vac_name.lower(), start_date, end_date, only_second, only_third, dry_run):
                     return True
 
         return False
 
-    def try_to_book_place(self, profile_id, motive_id, practice_id, agenda_ids, vac_name, start_date, end_date,
-                          only_second, only_third, dry_run=False):
+    def try_to_book_place(self, profile_id, motive_id, practice_id, agenda_ids, vac_name, start_date, end_date, only_second, only_third, dry_run=False):
         date = start_date.strftime('%Y-%m-%d')
         while date is not None:
             self.availabilities.go(
@@ -443,9 +435,9 @@ class Doctolib(LoginBrowser):
         log('  ├╴ Best slot found: %s', parse_date(
             slot_date_first).strftime('%c'))
 
-        appointment = {'profile_id': profile_id,
+        appointment = {'profile_id':    profile_id,
                        'source_action': 'profile',
-                       'start_date': slot_date_first,
+                       'start_date':    slot_date_first,
                        'visit_motive_ids': str(motive_id),
                        }
 
@@ -555,42 +547,76 @@ class Doctolib(LoginBrowser):
 
         return self.page.doc['confirmed']
 
-class VaccinePlace:
-    def __init__(self, place, vaccine_key, vaccine_motives):
-        self.place = place
-        self.vaccine_key = vaccine_key
-        self.vaccine_motives = vaccine_motives
+class VaccineInterface():
+    "The vaccine builder interface"
+    def vaccine_add_DoctolibDE(self):
+        " For doctolib Germany assign vaccines keys and motive value for doses "
+    def vaccine_add_DoctolibFR(self):
+        " For doctolib France assign vaccines keys and motive value for doses "
 
-class DoctolibPlace(Doctolib):
-    if "fr" in str(VaccinePlace):
-        BASEURL = 'https://www.doctolib.fr'
+class DoctolibVaccine(VaccineInterface):
+    #Concreate Builder
+    def __init__(self):
+        self.productDE = DoctolibDE(Doctolib)
+        self.productFR = DoctolibFR(Doctolib)
 
-    KEY_PFIZER = VaccinePlace('fr', '6970', 'Pfizer')
-    KEY_PFIZER_SECOND = VaccinePlace('fr', '6971', '2de.*Pfizer')
-    KEY_PFIZER_THIRD = VaccinePlace('fr', '8192', '3e.*Pfizer')
-    KEY_MODERNA = VaccinePlace('fr', '7005', 'Moderna')
-    KEY_MODERNA_SECOND = VaccinePlace('fr', '7004', '2de.*Moderna')
-    KEY_MODERNA_THIRD = VaccinePlace('fr', '8193', '3e.*Moderna')
-    KEY_JANSSEN = VaccinePlace('fr', '7945', 'Janssen')
-    KEY_ASTRAZENECA = VaccinePlace('fr', '7107', 'AstraZeneca')
-    KEY_ASTRAZENECA_SECOND = VaccinePlace('fr', '7108', '2de.*AstraZeneca')
+    def vaccine_add_DoctolibDE(self):
+        self.productDE.KEY_PFIZER.append('6768', 'Pfizer')
+        self.productDE.KEY_PFIZER_SECOND.append('6769', 'Zweit.*Pfizer|Pfizer.*Zweit')
+        self.productDE.KEY_PFIZER_THIRD.append(None, 'Dritt.*Pfizer|Pfizer.*Dritt')
+        self.productDE.KEY_MODERNA.append('6936', 'Moderna')
+        self.productDE.KEY_MODERNA_SECOND.append('6937', 'Zweit.*Moderna|Moderna.*Zweit')
+        self.productDE.KEY_MODERNA_THIRD.append(None, 'Dritt.*Moderna|Moderna.*Dritt')
+        self.productDE.KEY_JANSSEN.append('7978', 'Janssen')
+        self.productDE.KEY_ASTRAZENECA.append('7109', 'AstraZeneca')
+        self.productDE.KEY_ASTRAZENECA_SECOND.append('7110', 'Zweit.*AstraZeneca|AstraZeneca.*Zweit')
 
-    if "de" in str(VaccinePlace):
-        BASEURL = 'https://www.doctolib.de'
-    KEY_PFIZER = VaccinePlace('de', '6768', 'Pfizer')
-    KEY_PFIZER_SECOND = VaccinePlace('de', '6769', 'Zweit.*Pfizer|Pfizer.*Zweit')
-    KEY_PFIZER_THIRD = VaccinePlace('de', None, 'Dritt.*Pfizer|Pfizer.*Dritt')
-    KEY_MODERNA = VaccinePlace('de', '6936', 'Moderna')
-    KEY_MODERNA_SECOND = VaccinePlace('de', '6937', 'Zweit.*Moderna|Moderna.*Zweit')
-    KEY_MODERNA_THIRD = VaccinePlace('de', None, 'Dritt.*Moderna|Moderna.*Dritt')
-    KEY_JANSSEN = VaccinePlace('de', '7978', 'Janssen')
-    KEY_ASTRAZENECA = VaccinePlace('de', '7109', 'AstraZeneca')
-    KEY_ASTRAZENECA_SECOND = VaccinePlace('de', '7110', 'Zweit.*AstraZeneca|AstraZeneca.*Zweit')
+    def vaccine_add_DoctolibFR(self):
+        self.productFR.KEY_PFIZER.append('6970', 'Pfizer')
+        self.productFR.KEY_PFIZER_SECOND.append('6971', '2de.*Pfizer')
+        self.productFR.KEY_PFIZER_THIRD.append('8192', '3e.*Pfizer')
+        self.productFR.KEY_MODERNA.append('7005', 'Moderna')
+        self.productFR.KEY_MODERNA_SECOND.append('7004', '2de.*Moderna')
+        self.productFR.KEY_MODERNA_THIRD.append('8193', '3e.*Moderna')
+        self.productFR.KEY_JANSSEN.append('7945', 'Janssen')
+        self.productFR.KEY_ASTRAZENECA.append('7107', 'AstraZeneca')
+        self.productFR.KEY_ASTRAZENECA_SECOND.append('7108', '2de.*AstraZeneca')
+
+#The resulting product for doctolib germany
+class DoctolibDE(Doctolib):
+    BASEURL = 'https://www.doctolib.de'
+    def __init__(self):
+        self.KEY_PFIZER = []
+        self.KEY_PFIZER_SECOND = []
+        self.KEY_PFIZER_THIRD = []
+        self.KEY_MODERNA = []
+        self.KEY_MODERNA_SECOND = []
+        self.KEY_MODERNA_THIRD = []
+        self.KEY_JANSSEN = []
+        self.KEY_ASTRAZENECA = []
+        self.KEY_ASTRAZENECA_SECOND = []
 
     centers = URL(r'/impfung-covid-19-corona/(?P<where>\w+)', CentersPage)
     center = URL(r'/praxis/.*', CenterPage)
 
+#The resulting product for doctolib france
+class DoctolibFR(Doctolib):
+    BASEURL = 'https://www.doctolib.fr'
+    def __init__(self):
+        self.KEY_PFIZER = []
+        self.KEY_PFIZER_SECOND = []
+        self.KEY_PFIZER_THIRD = []
+        self.KEY_MODERNA = []
+        self.KEY_MODERNA_SECOND = []
+        self.KEY_MODERNA_THIRD = []
+        self.KEY_JANSSEN = []
+        self.KEY_ASTRAZENECA = []
+        self.KEY_ASTRAZENECA_SECOND = []
 
+    centers = URL(r'/vaccination-covid-19/(?P<where>\w+)', CentersPage)
+    center = URL(r'/centre-de-sante/.*', CenterPage)
+
+#client or director
 class Application:
     @classmethod
     def create_default_logger(cls):
@@ -611,8 +637,8 @@ class Application:
         colorama.init()  # needed for windows
 
         doctolib_map = {
-            "fr": Doctolib,
-            "de": Doctolib
+            "fr": DoctolibFR,
+            "de": DoctolibDE
         }
 
         parser = argparse.ArgumentParser(
@@ -678,8 +704,7 @@ class Application:
 
         patients = docto.get_patients()
         if len(patients) == 0:
-            print(
-                "It seems that you don't have any Patient registered in your Doctolib account. Please fill your Patient data on Doctolib Website.")
+            print("It seems that you don't have any Patient registered in your Doctolib account. Please fill your Patient data on Doctolib Website.")
             return 1
         if args.patient >= 0 and args.patient < len(patients):
             docto.patient = patients[args.patient]
@@ -821,8 +846,7 @@ class Application:
 
                     log('Center %(name_with_title)s (%(city)s):' % center)
 
-                    if docto.try_to_book(center, vaccine_list, start_date, end_date, args.only_second, args.only_third,
-                                         args.dry_run):
+                    if docto.try_to_book(center, vaccine_list, start_date, end_date, args.only_second, args.only_third, args.dry_run):
                         log('')
                         log('💉 %s Congratulations.' %
                             colored('Booked!', 'green', attrs=('bold',)))
@@ -831,8 +855,7 @@ class Application:
                     sleep(SLEEP_INTERVAL_AFTER_CENTER)
 
                     log('')
-                log('No free slots found at selected centers. Trying another round in %s sec...',
-                    SLEEP_INTERVAL_AFTER_RUN)
+                log('No free slots found at selected centers. Trying another round in %s sec...', SLEEP_INTERVAL_AFTER_RUN)
                 sleep(SLEEP_INTERVAL_AFTER_RUN)
             except CityNotFound as e:
                 print('\n%s: City %s not found. Make sure you selected a city from the available countries.' % (
