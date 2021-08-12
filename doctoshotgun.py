@@ -547,60 +547,76 @@ class Doctolib(LoginBrowser):
 
         return self.page.doc['confirmed']
 
+class VaccineInterface():
+    "The vaccine builder interface"
+    def vaccine_add_DoctolibDE(self):
+        " For doctolib Germany assign vaccines keys and motive value for doses "
+    def vaccine_add_DoctolibFR(self):
+        " For doctolib France assign vaccines keys and motive value for doses "
 
+class DoctolibVaccine(VaccineInterface):
+    #Concreate Builder
+    def __init__(self):
+        self.productDE = DoctolibDE(Doctolib)
+        self.productFR = DoctolibFR(Doctolib)
+
+    def vaccine_add_DoctolibDE(self):
+        self.productDE.KEY_PFIZER.append('6768', 'Pfizer')
+        self.productDE.KEY_PFIZER_SECOND.append('6769', 'Zweit.*Pfizer|Pfizer.*Zweit')
+        self.productDE.KEY_PFIZER_THIRD.append(None, 'Dritt.*Pfizer|Pfizer.*Dritt')
+        self.productDE.KEY_MODERNA.append('6936', 'Moderna')
+        self.productDE.KEY_MODERNA_SECOND.append('6937', 'Zweit.*Moderna|Moderna.*Zweit')
+        self.productDE.KEY_MODERNA_THIRD.append(None, 'Dritt.*Moderna|Moderna.*Dritt')
+        self.productDE.KEY_JANSSEN.append('7978', 'Janssen')
+        self.productDE.KEY_ASTRAZENECA.append('7109', 'AstraZeneca')
+        self.productDE.KEY_ASTRAZENECA_SECOND.append('7110', 'Zweit.*AstraZeneca|AstraZeneca.*Zweit')
+
+    def vaccine_add_DoctolibFR(self):
+        self.productFR.KEY_PFIZER.append('6970', 'Pfizer')
+        self.productFR.KEY_PFIZER_SECOND.append('6971', '2de.*Pfizer')
+        self.productFR.KEY_PFIZER_THIRD.append('8192', '3e.*Pfizer')
+        self.productFR.KEY_MODERNA.append('7005', 'Moderna')
+        self.productFR.KEY_MODERNA_SECOND.append('7004', '2de.*Moderna')
+        self.productFR.KEY_MODERNA_THIRD.append('8193', '3e.*Moderna')
+        self.productFR.KEY_JANSSEN.append('7945', 'Janssen')
+        self.productFR.KEY_ASTRAZENECA.append('7107', 'AstraZeneca')
+        self.productFR.KEY_ASTRAZENECA_SECOND.append('7108', '2de.*AstraZeneca')
+
+#The resulting product for doctolib germany
 class DoctolibDE(Doctolib):
     BASEURL = 'https://www.doctolib.de'
-    KEY_PFIZER = '6768'
-    KEY_PFIZER_SECOND = '6769'
-    KEY_PFIZER_THIRD = None
-    KEY_MODERNA = '6936'
-    KEY_MODERNA_SECOND = '6937'
-    KEY_MODERNA_THIRD = None
-    KEY_JANSSEN = '7978'
-    KEY_ASTRAZENECA = '7109'
-    KEY_ASTRAZENECA_SECOND = '7110'
-    vaccine_motives = {
-        KEY_PFIZER: 'Pfizer',
-        KEY_PFIZER_SECOND: 'Zweit.*Pfizer|Pfizer.*Zweit',
-        KEY_PFIZER_THIRD: 'Dritt.*Pfizer|Pfizer.*Dritt',
-        KEY_MODERNA: 'Moderna',
-        KEY_MODERNA_SECOND: 'Zweit.*Moderna|Moderna.*Zweit',
-        KEY_MODERNA_THIRD: 'Dritt.*Moderna|Moderna.*Dritt',
-        KEY_JANSSEN: 'Janssen',
-        KEY_ASTRAZENECA: 'AstraZeneca',
-        KEY_ASTRAZENECA_SECOND: 'Zweit.*AstraZeneca|AstraZeneca.*Zweit',
-    }
+    def __init__(self):
+        self.KEY_PFIZER = []
+        self.KEY_PFIZER_SECOND = []
+        self.KEY_PFIZER_THIRD = []
+        self.KEY_MODERNA = []
+        self.KEY_MODERNA_SECOND = []
+        self.KEY_MODERNA_THIRD = []
+        self.KEY_JANSSEN = []
+        self.KEY_ASTRAZENECA = []
+        self.KEY_ASTRAZENECA_SECOND = []
+
     centers = URL(r'/impfung-covid-19-corona/(?P<where>\w+)', CentersPage)
     center = URL(r'/praxis/.*', CenterPage)
 
-
+#The resulting product for doctolib france
 class DoctolibFR(Doctolib):
     BASEURL = 'https://www.doctolib.fr'
-    KEY_PFIZER = '6970'
-    KEY_PFIZER_SECOND = '6971'
-    KEY_PFIZER_THIRD = '8192'
-    KEY_MODERNA = '7005'
-    KEY_MODERNA_SECOND = '7004'
-    KEY_MODERNA_THIRD = '8193'
-    KEY_JANSSEN = '7945'
-    KEY_ASTRAZENECA = '7107'
-    KEY_ASTRAZENECA_SECOND = '7108'
-    vaccine_motives = {
-        KEY_PFIZER: 'Pfizer',
-        KEY_PFIZER_SECOND: '2de.*Pfizer',
-        KEY_PFIZER_THIRD: '3e.*Pfizer',
-        KEY_MODERNA: 'Moderna',
-        KEY_MODERNA_SECOND: '2de.*Moderna',
-        KEY_MODERNA_THIRD: '3e.*Moderna',
-        KEY_JANSSEN: 'Janssen',
-        KEY_ASTRAZENECA: 'AstraZeneca',
-        KEY_ASTRAZENECA_SECOND: '2de.*AstraZeneca',
-    }
+    def __init__(self):
+        self.KEY_PFIZER = []
+        self.KEY_PFIZER_SECOND = []
+        self.KEY_PFIZER_THIRD = []
+        self.KEY_MODERNA = []
+        self.KEY_MODERNA_SECOND = []
+        self.KEY_MODERNA_THIRD = []
+        self.KEY_JANSSEN = []
+        self.KEY_ASTRAZENECA = []
+        self.KEY_ASTRAZENECA_SECOND = []
 
     centers = URL(r'/vaccination-covid-19/(?P<where>\w+)', CentersPage)
     center = URL(r'/centre-de-sante/.*', CenterPage)
 
-
+#client or director
 class Application:
     @classmethod
     def create_default_logger(cls):
